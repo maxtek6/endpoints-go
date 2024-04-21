@@ -82,7 +82,7 @@ func TestServerHTTP(t *testing.T) {
 	responseWriter := NewTestResponseWriter()
 
 	endpoint := New()
-	endpoint.AddMethod(http.MethodPost, func(w http.ResponseWriter, r *http.Request) {
+	_ = endpoint.AddMethod(http.MethodPost, func(w http.ResponseWriter, r *http.Request) {
 		postHandled = true
 	})
 
