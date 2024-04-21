@@ -25,17 +25,30 @@ import (
 	"net/http"
 )
 
+// The Endpoint type represents a single HTTP endpoint. All requests
+// to this URL will be served through this object.
 type Endpoint struct {
 	handlers            map[string]http.HandlerFunc
 	onUnsupportedMethod http.HandlerFunc
 }
 
+// New creates a new Endpoint.
+//
+// The newly constructed Endpoint has no supported method and cannot
+// be used to serve requests until it is mounted using http.Handle or
+// a similar function.
 func New() *Endpoint {
 	return &Endpoint{
 		handlers: map[string]http.HandlerFunc{},
 	}
 }
 
+// The AddMethod function adds support for a specific HTTP method.
+//
+// Each HTTP method is mapped to an http.HandlerFunc object. If the
+// method has been previously added with another http.HandlerFunc,
+// the old value will be overwritten. An error will be returned if
+// method does not match a valid HTTP method.
 func (e *Endpoint) AddMethod(method string, f http.HandlerFunc) error {
 	switch method {
 	case http.MethodConnect:
@@ -62,6 +75,12 @@ func (e *Endpoint) AddMethod(method string, f http.HandlerFunc) error {
 	return nil
 }
 
+// Remove function removes support for a specific HTTP method.
+//
+// If the method has been previously mapped to an http.HandlerFunc,
+// the value will be removed from the map and the Endpoint will no
+// longer support that method. An error will be returned if there is
+// no http.HandlerFunc associated wit the method string.
 func (e *Endpoint) RemoveMethod(method string) error {
 	_, ok := e.handlers[method]
 	if !ok {
@@ -71,10 +90,19 @@ func (e *Endpoint) RemoveMethod(method string) error {
 	return nil
 }
 
+// HandleUnsupportedMethod sets an http.HandlerFunc for unsupported
+// methods.
+//
+// By default, an http.Request that is passed to an endpoint will
+// return http.StatusMethodNotAllowed and no response body if the
+// method has not been added to the endpoint. Using this function
+// will redirect all requests with unsupported request methods to
+// a single http.HandlerFunc.
 func (e *Endpoint) HandleUnsupportedMethod(f http.HandlerFunc) {
 	e.onUnsupportedMethod = f
 }
 
+// ServeHTTP implements the http.Handler interface.
 func (e *Endpoint) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	handler, ok := e.handlers[r.Method]
 	if ok {
