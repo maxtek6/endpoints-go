@@ -21,6 +21,7 @@
 package endpoints
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -50,6 +51,9 @@ func New() *Endpoint {
 // the old value will be overwritten. An error will be returned if
 // method does not match a valid HTTP method.
 func (e *Endpoint) AddMethod(method string, f http.HandlerFunc) error {
+	if f == nil {
+		return errors.New("nil HandlerFunc")
+	}
 	switch method {
 	case http.MethodConnect:
 		fallthrough
@@ -98,8 +102,12 @@ func (e *Endpoint) RemoveMethod(method string) error {
 // method has not been added to the endpoint. Using this function
 // will redirect all requests with unsupported request methods to
 // a single http.HandlerFunc.
-func (e *Endpoint) HandleUnsupportedMethod(f http.HandlerFunc) {
+func (e *Endpoint) HandleUnsupportedMethod(f http.HandlerFunc) error {
+	if f == nil {
+		return errors.New("nil HandlerFunc")
+	}
 	e.onUnsupportedMethod = f
+	return nil
 }
 
 // ServeHTTP implements the http.Handler interface.

@@ -36,6 +36,9 @@ func TestAddMethod(t *testing.T) {
 	err := endpoint.AddMethod("BADMETHOD", dummyHandler)
 	assert.Error(t, err)
 
+	err = endpoint.AddMethod(http.MethodGet, nil)
+	assert.Error(t, err)
+
 	err = endpoint.AddMethod(http.MethodConnect, dummyHandler)
 	assert.NoError(t, err)
 }
@@ -52,6 +55,19 @@ func TestRemoveMethod(t *testing.T) {
 	assert.Error(t, err)
 
 	err = endpoint.RemoveMethod(http.MethodGet)
+	assert.NoError(t, err)
+}
+
+func TestHandleUnsupportedMethod(t *testing.T) {
+	endpoint := New()
+	dummyHandler := func(w http.ResponseWriter, r *http.Request) {
+
+	}
+
+	err := endpoint.HandleUnsupportedMethod(nil)
+	assert.Error(t, err)
+
+	err = endpoint.HandleUnsupportedMethod(dummyHandler)
 	assert.NoError(t, err)
 }
 
