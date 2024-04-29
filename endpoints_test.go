@@ -108,7 +108,7 @@ func TestServerHTTP(t *testing.T) {
 	endpoint.ServeHTTP(responseWriter, getRequest)
 	assert.False(t, unsupportedHandled)
 
-	endpoint.HandleUnsupportedMethod(func(w http.ResponseWriter, r *http.Request) {
+	_ = endpoint.HandleUnsupportedMethod(func(w http.ResponseWriter, r *http.Request) {
 		unsupportedHandled = true
 	})
 	endpoint.ServeHTTP(responseWriter, getRequest)
